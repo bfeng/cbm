@@ -1,0 +1,4 @@
+Existing Git Repo
+ cd existing_git_repo
+ git remote add origin git@github.com:bfeng/cbm.git
+ git push -u origin master
