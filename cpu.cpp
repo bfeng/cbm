@@ -13,47 +13,120 @@ void int_martric(int martric[N][N])
   }
 }
 
-void one_thread()
+void float_martric(float martric[N][N])
 {
-  // integer operations test
-  long operations = long(std::pow(N, 3)*3);
-  std::cout<<"Integer Operations:"<<operations<<std::endl;
-  int test = 10;
-  int A[N][N];
-  int B[N][N];
-
-  int_martric(A);
-  int_martric(B);
-
-  int C[N][N];
-  for(int j=0;j<test;++j)
+  for(int i=0;i<N;++i)
   {
-    auto start = NOW();
-    
-    for(int i=0;i<N;++i)
+    for(int j=0;j<N;++j)
     {
-      for(int j=0;j<N;++j)
+      martric[i][j] = (float)rand()/(float)RAND_MAX;
+    }
+  }
+}
+
+void integer_operation(int A[N][N], int B[N][N], int C[N][N])
+{
+  for(int i=0;i<N;++i)
+  {
+    for(int j=0;j<N;++j)
+    {
+      C[i][j] = 0;
+      for(int k=0;k<N;++k)
       {
-        C[i][j] = 0;
-        for(int k=0;k<N;++k)
-        {
-          C[i][j]+=A[i][k]*B[k][j];
-        }
+        C[i][j]+=A[i][k]*B[k][j];
       }
     }
+  }
+}
 
+void float_operation(float A[N][N], float B[N][N], float C[N][N])
+{
+  for(int i=0;i<N;++i)
+  {
+    for(int j=0;j<N;++j)
+    {
+      C[i][j] = 0;
+      for(int k=0;k<N;++k)
+      {
+        C[i][j]+=A[i][k]*B[k][j];
+      }
+    }
+  }
+}
+
+void n_thread(int n)
+{
+  int test = 10;
+
+  // integer operations test
+  long operations = long(std::pow(N, 3)*3)*n;
+  std::cout<<"Total Integer Operations:"<<operations<<std::endl;
+
+  for(int j=0;j<test;++j)
+  {
+    std::cout << "Test "<< j << "\t~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
+
+    double dur = 0.0;
+    int A[N][N];
+    int B[N][N];
+    int C[N][N];
+
+    int_martric(A);
+    int_martric(B);
+
+    boost::thread worker[n];
+    for(int i=0;i<n;++i)
+      worker[i] = boost::thread(integer_operation, A, B, C);
+
+    auto start = NOW();
+    for(int i=0;i<n;++i)
+      worker[i].join();
     auto end = NOW();
+    dur = DURATION(end, start);
 
-    double dur = DURATION(end, start);
-    std::cout<<"Duration:"<< dur <<"s"<<std::endl;
-    std::cout<<"IOPS:"<< operations/dur <<std::endl;
+    std::cout << "Duration:" << dur*1000 << "ms" << std::endl;
+    std::cout << "IOPS:"<< operations/dur << std::endl;
+  }
+
+  // floating-point operations test
+  std::cout<<"Total Floating-point Operations:"<<operations<<std::endl;
+
+  for(int j=0;j<test;++j)
+  {
+    std::cout << "Test "<< j << "\t~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
+
+    double dur = 0.0;
+    float A[N][N];
+    float B[N][N];
+    float C[N][N];
+
+    float_martric(A);
+    float_martric(B);
+
+    boost::thread worker[n];
+    for(int i=0;i<n;++i)
+      worker[i] = boost::thread(float_operation, A, B, C);
+
+    auto start = NOW();
+    for(int i=0;i<n;++i)
+      worker[i].join();
+    auto end = NOW();
+    dur = DURATION(end, start);
+
+    std::cout << "Duration:" << dur*1000 << "ms" << std::endl;
+    std::cout << "IOPS:"<< operations/dur << std::endl;
   }
 }
 
 int main()
 {
   srand(time(0));
-  one_thread();
+
+  n_thread(1);
+  n_thread(2);
+  n_thread(4);
+  n_thread(8);
+
   return 0;
 }
 
