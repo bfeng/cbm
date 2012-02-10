@@ -26,6 +26,6 @@ Other requirements:
 
 * Since there are only ~15 nodes in CSRocks and 60 students in the class, plus 2 other classes that use this cluster (CS546 and CS550), it's likely that the cluster will be heavily used; it is important to understand what else is running (processes, CPU consumption, etc) on each node during your benchmarks so that you can explain the results.
 
-* Since CSRocks is a heavily used cluster, your results will likely vary widely at peak times. In order to mitigate this, all benchmarks must be run 3 times, and the reported values should be the average and standard deviation.
+* Since CSRocks is a heavily used cluster, your results will likely vary widely at peak times. In order to mitigate this, all benchmarks must be run 3 times, and the reported values should be the **average and standard deviation**.
 
 * No GUIs are required. Simple command line interfaces are fine.
