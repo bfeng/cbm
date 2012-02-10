@@ -1,24 +1,59 @@
-#include <iostream>
-#include <boost/timer.hpp>
-#include <cmath>
+#include "stdafx.hpp"
 
-using boost::timer;
+const int N = 100;
+
+void int_martric(int martric[N][N])
+{
+  for(int i=0;i<N;++i)
+  {
+    for(int j=0;j<N;++j)
+    {
+      martric[i][j] = rand();
+    }
+  }
+}
+
+void one_thread()
+{
+  // integer operations test
+  long operations = long(std::pow(N, 3)*3);
+  std::cout<<"Integer Operations:"<<operations<<std::endl;
+  int test = 10;
+  int A[N][N];
+  int B[N][N];
+
+  int_martric(A);
+  int_martric(B);
+
+  int C[N][N];
+  for(int j=0;j<test;++j)
+  {
+    auto start = NOW();
+    
+    for(int i=0;i<N;++i)
+    {
+      for(int j=0;j<N;++j)
+      {
+        C[i][j] = 0;
+        for(int k=0;k<N;++k)
+        {
+          C[i][j]+=A[i][k]*B[k][j];
+        }
+      }
+    }
+
+    auto end = NOW();
+
+    double dur = DURATION(end, start);
+    std::cout<<"Duration:"<< dur <<"s"<<std::endl;
+    std::cout<<"IOPS:"<< operations/dur <<std::endl;
+  }
+}
 
 int main()
 {
-  double times[20];
-  for(int j=0;j<20;++j)
-  {
-    timer t;
-    for(long i=0;i<1000000000;++i);
-    times[j]=t.elapsed();
-  }
-
-  std::cout<<"Integer Operations"<<std::endl;
-  for(int j=0;j<20;++j)
-  {
-    std::cout<<times[j]<<"s"<<std::endl;
-  }
-
+  srand(time(0));
+  one_thread();
   return 0;
 }
+

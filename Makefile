@@ -1,10 +1,12 @@
 .PHONY: all clean
+CCC=g++
+CCFLAGS=-std=c++0x
 
 all: cpu
 	./cpu
 
-cpu:
-	g++ -o cpu cpu.cpp
+cpu: cpu.cpp
+	$(CCC) $(CCFLAGS) -o cpu cpu.cpp -I.
 
 clean:
-	rm cbm
+	rm cpu
