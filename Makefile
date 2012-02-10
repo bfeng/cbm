@@ -1,7 +1,10 @@
 .PHONY: all clean
 
-all:
-	gcc -o cbm main.c
+all: cpu
+	./cpu
+
+cpu:
+	g++ -o cpu cpu.cpp
 
 clean:
 	rm cbm
