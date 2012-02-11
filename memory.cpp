@@ -43,7 +43,7 @@ void n_thread(int n, const int N)
       worker[j].join();
     auto end = NOW();
     double dur = DURATION(end, start);
-    int size = sizeof(mem) * n;
+    long size = sizeof(mem) * n;
 
     std::cout << "Size: " << size << " Bytes" << std::endl;
     std::cout << "Time: " << dur << " s" << std::endl;
