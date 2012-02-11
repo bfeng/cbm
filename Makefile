@@ -1,16 +1,16 @@
 .PHONY: all clean
 CCC=g++
-CCFLAGS=-std=c++0x
+CCFLAGS=-std=c++0x -I/usr/include/boost -L/usr/lib -lboost_thread-mt
 
 all: cpu mem
-	./cpu
+	##./cpu
 	./mem
 
 cpu: cpu.cpp
-	$(CCC) $(CCFLAGS) -o cpu cpu.cpp -I/usr/include/boost -L/usr/lib -lboost_thread-mt
+	$(CCC) -o cpu cpu.cpp $(CCFLAGS)
 
 mem: memory.cpp
-	$(CCC) $(CCFLAGS) -o mem memory.cpp
+	$(CCC) -o mem memory.cpp $(CCFLAGS)
 
 clean:
 	rm cpu mem
