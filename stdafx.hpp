@@ -1,8 +1,13 @@
-#include <chrono>
-#include <iostream>
 #include <cstdlib>
+#include <cstdio>
 #include <ctime>
 #include <cmath>
+#include <chrono>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <iostream>
+#include <string>
 #include <boost/thread.hpp>
 
 #define NOW() std::chrono::high_resolution_clock::now()
