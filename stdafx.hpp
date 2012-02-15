@@ -9,7 +9,9 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <boost/thread.hpp>
+#include <boost/thread/thread.hpp>
+#include <boost/array.hpp>
+#include <boost/asio.hpp>
 
 #define NOW() std::chrono::high_resolution_clock::now()
 #define DURATION(end, start) std::chrono::duration<double>(end - start).count() 
