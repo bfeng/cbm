@@ -18,10 +18,12 @@ void server()
 
     for (;;)
     {
-      boost::array<char, 1> recv_buf;
+      char recv_buf[128];
       udp::endpoint remote_endpoint;
       boost::system::error_code error;
-      socket.receive_from(boost::asio::buffer(recv_buf), remote_endpoint, 0, error);
+      size_t len = socket.receive_from(boost::asio::buffer(recv_buf), remote_endpoint, 0, error);
+      std::cout.write(recv_buf, len);
+      std::cout << std::endl;
 
       if (error && error != boost::asio::error::message_size)
         throw boost::system::system_error(error);
