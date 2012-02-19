@@ -5,6 +5,13 @@ void disk_read_seq_worker()
   
 }
 
+void print_result(long file_size, double dur)
+{
+    std::cout << "Size: " << file_size << " Bytes" << std::endl;
+    std::cout << "Time: " << dur << " ms" << std::endl;
+    std::cout << "Throughput: " << ((float)file_size/1024/1024)/(dur/1000) << " MB/s" << std::endl;
+}
+
 void one_thread()
 {
   std::cout << "Disk Test" << "\t~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
@@ -28,9 +35,8 @@ void one_thread()
     struct stat buf;
     stat(filename, &buf);
     long file_size = buf.st_size;
-    std::cout << "Size: " << file_size << " Bytes" << std::endl;
-    std::cout << "Time: " << dur << " s" << std::endl;
-    std::cout << "Throughput: " << ((float)file_size/1024/1024)/(dur) << " MB/s" << std::endl;
+
+    print_result(file_size, dur);
   }
 
   std::cout << "Write Operation" << std::endl;
@@ -55,9 +61,8 @@ void one_thread()
     struct stat buf;
     stat(filename, &buf);
     long file_size = buf.st_size;
-    std::cout << "Size: " << file_size << " Bytes" << std::endl;
-    std::cout << "Time: " << dur << " s" << std::endl;
-    std::cout << "Throughput: " << ((float)file_size/1024/1024)/(dur) << " MB/s" << std::endl;
+
+    print_result(file_size, dur);
   }
 
   std::cout << "Random Read Operations" << std::endl;
@@ -85,9 +90,8 @@ void one_thread()
     struct stat buf;
     stat(filename_str.data(), &buf);
     long file_size = buf.st_size;
-    std::cout << "Size: " << file_size << " Bytes" << std::endl;
-    std::cout << "Time: " << dur << " s" << std::endl;
-    std::cout << "Throughput: " << ((float)file_size/1024/1024)/(dur) << " MB/s" << std::endl;
+
+    print_result(file_size, dur);
   }
 
   /*

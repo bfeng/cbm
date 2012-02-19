@@ -46,7 +46,7 @@ void n_thread(int n, const int N)
     long size = sizeof(mem) * n;
 
     std::cout << "Size: " << size << " Bytes" << std::endl;
-    std::cout << "Time: " << dur << " s" << std::endl;
+    std::cout << "Time: " << dur*1000 << " ms" << std::endl;
     std::cout << "Throughput: " << ((float)size/1024/1024)/(dur) << " MB/s" << std::endl;
   }
 }

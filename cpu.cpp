@@ -84,8 +84,8 @@ void n_thread(int n)
     auto end = NOW();
     dur = DURATION(end, start);
 
-    std::cout << "Duration:" << dur*1000 << "ms" << std::endl;
-    std::cout << "IOPS:"<< operations/dur << std::endl;
+    std::cout << "Duration:" << dur*1000 << " s" << std::endl;
+    std::cout << "IOPS:"<< operations/(dur) << std::endl;
   }
 
   // floating-point operations test
@@ -113,8 +113,8 @@ void n_thread(int n)
     auto end = NOW();
     dur = DURATION(end, start);
 
-    std::cout << "Duration:" << dur*1000 << "ms" << std::endl;
-    std::cout << "IOPS:"<< operations/dur << std::endl;
+    std::cout << "Duration:" << dur*1000 << " s" << std::endl;
+    std::cout << "IOPS:"<< operations/(dur) << std::endl;
   }
 }
 

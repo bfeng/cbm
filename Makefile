@@ -4,27 +4,29 @@ CCFLAGS=-std=c++0x -I/usr/include/boost -L/usr/lib -lboost_thread-mt -lboost_sys
 OBJECTS=cpu mem predisk disk network_client network_server
 
 all: $(OBJECTS)
+
+run: all
 	##./cpu
 	##./mem
 	##./predisk
 	##./disk
 
-cpu: cpu.cpp
+cpu: cpu.cpp stdafx.hpp
 	$(CCC) -o cpu cpu.cpp $(CCFLAGS)
 
-mem: memory.cpp
+mem: memory.cpp stdafx.hpp
 	$(CCC) -o mem memory.cpp $(CCFLAGS)
 
-predisk: predisk.cpp
+predisk: predisk.cpp stdafx.hpp
 	$(CCC) -o predisk predisk.cpp $(CCFLAGS)
 
-disk: disk.cpp
+disk: disk.cpp stdafx.hpp
 	$(CCC) -o disk disk.cpp $(CCFLAGS)
 
-network_client: network_client.cpp
+network_client: network_client.cpp stdafx.hpp
 	$(CCC) -o network_client network_client.cpp $(CCFLAGS)
 
-network_server: network_server.cpp
+network_server: network_server.cpp stdafx.hpp
 	$(CCC) -o network_server network_server.cpp $(CCFLAGS)
 
 clean:
