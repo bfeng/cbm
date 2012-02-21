@@ -54,7 +54,7 @@ void float_operation(float A[N][N], float B[N][N], float C[N][N])
   }
 }
 
-void n_thread(int n)
+void cput(int n)
 {
   int test = 10;
 
@@ -118,15 +118,16 @@ void n_thread(int n)
   }
 }
 
-int main()
+int main(int argc, char *argv[])
 {
+  if(argc != 2)
+  {
+    std::cerr << "Usuage: <n_thread>" << std::endl;
+    return 1;
+  }
   srand(time(0));
-
-  n_thread(1);
-  n_thread(2);
-  n_thread(4);
-  n_thread(8);
-
+  int n_thread = atoi(argv[1]);
+  cput(n_thread);
   return 0;
 }
 
