@@ -4,37 +4,58 @@ void print_results(long size, double dur)
 {
   std::cout << "Size: " << size << " Bytes" << std::endl;
   std::cout << "Time: " << dur*1000 << " ms" << std::endl;
-  std::cout << "Throughput: " << ((float)size/1024/1024)/(dur) << " MB/s" << std::endl;
+  std::cout << "Throughput: " << ((double)size/1024/1024)/(dur) << " MB/s" << std::endl;
 }
 
-void random_read_worker(char mem[], int ran[], const int block_size)
+void random_read_worker(const int block_size)
 {
+  char mem[block_size];
+  int ran[block_size];
+  char tmp;
+
+  for(int i=0;i<block_size;++i)
+  {
+    ran[i] = rand()%block_size;
+    mem[i] = (char)(ran[i]+'A');
+  }
+
   for(int i = 0;i<block_size;++i)
   {
-    mem[ran[i]];
+    tmp = mem[ran[i]];
   }
 }
 
-void random_write_worker(char mem[], int ran[], const int block_size)
+void random_write_worker(const int block_size)
 {
-  char c = '0';
+  char mem[block_size];
+  int ran[block_size];
+  char tmp = 'A';
+
+  for(int i=0;i<block_size;++i)
+  {
+    ran[i] = rand()%block_size;
+    mem[i] = (char)(ran[i]+'A');
+  }
   for(int i = 0;i<block_size;++i)
   {
-    std::cout << ran[i] << " " << std::endl;
-    //mem[ran[i]] = c;
+    mem[ran[i]] = tmp;
   }
 }
 
-void read_worker(char mem[], char c, const int block_size)
+void read_worker(const int block_size)
 {
+  char mem[block_size];
+  char c;
   for(int i = 0;i<block_size;++i)
   {
     c = mem[i];
   }
 }
 
-void write_worker(char mem[], char c, const int block_size)
+void write_worker(const int block_size)
 {
+  char mem[block_size];
+  char c;
   for(int i = 0;i<block_size;++i)
   {
     mem[i] = c;
@@ -44,32 +65,23 @@ void write_worker(char mem[], char c, const int block_size)
 void memt(char *cmd, bool is_random, int block_size, int n_thread)
 {
   boost::thread worker[n_thread];
-  char mem[block_size];
-  char tmp = '0';
   long size = 0;
   double dur = 0.0;
   if(is_random)
   {
     std::cout << "randomly ";
-    int ran[block_size];
     
-    for(int i=0;i<block_size;++i)
-    {
-      ran[i] = rand()%block_size;
-      std::cout << ran[i] << " " << std::endl;
-      mem[i] = (char)(ran[i]+'A');
-    }
     if(strcmp(cmd, "read")==0)
     {
       std::cout << "read" << std::endl;
       for(int j=0;j<n_thread;++j)
-        worker[j] = boost::thread(random_read_worker, mem, ran, block_size);
+        worker[j] = boost::thread(&random_read_worker, block_size);
     }
     else if(strcmp(cmd, "write")==0)
     {
       std::cout << "write" << std::endl;
       for(int j=0;j<n_thread;++j)
-        worker[j] = boost::thread(random_write_worker, mem, ran, block_size);
+        worker[j] = boost::thread(&random_write_worker, block_size);
     }
   }
   else
@@ -78,22 +90,22 @@ void memt(char *cmd, bool is_random, int block_size, int n_thread)
     {
       std::cout << "read" << std::endl;
       for(int j=0;j<n_thread;++j)
-        worker[j] = boost::thread(read_worker, mem, tmp, block_size);
+        worker[j] = boost::thread(read_worker, block_size);
     }
     else if(strcmp(cmd, "write")==0)
     {
       std::cout << "write" << std::endl;
       for(int j=0;j<n_thread;++j)
-        worker[j] = boost::thread(write_worker, mem, tmp, block_size);
+        worker[j] = boost::thread(write_worker, block_size);
     }
   }
-  std::cout << "Memrory testing...." << std::endl;
+  std::cout << "start timer ...." << std::endl;
   auto start = NOW();
   for(int j=0;j<n_thread;++j)
     worker[j].join();
   auto end = NOW();
   dur = DURATION(end, start);
-  size = block_size * n_thread;
+  size = 2 * block_size * n_thread;
   print_results(size, dur);
 }
 
