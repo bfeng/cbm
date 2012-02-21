@@ -84,7 +84,7 @@ void cput(int n)
     auto end = NOW();
     dur = DURATION(end, start);
 
-    std::cout << "Duration:" << dur*1000 << " s" << std::endl;
+    std::cout << "Duration:" << dur*1000 << " ms" << std::endl;
     std::cout << "IOPS:"<< operations/(dur) << std::endl;
   }
 
@@ -113,8 +113,8 @@ void cput(int n)
     auto end = NOW();
     dur = DURATION(end, start);
 
-    std::cout << "Duration:" << dur*1000 << " s" << std::endl;
-    std::cout << "IOPS:"<< operations/(dur) << std::endl;
+    std::cout << "Duration:" << dur*1000 << " ms" << std::endl;
+    std::cout << "FLOPS:"<< operations/(dur) << std::endl;
   }
 }
 
