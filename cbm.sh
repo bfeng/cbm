@@ -33,7 +33,7 @@ disktest() {
       do
         for l in "${thread[@]}"
         do
-          echo "./disk $i $j $k $l"
+          ./disk $i $j $k $l
         done
       done
     done
