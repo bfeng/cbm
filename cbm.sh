@@ -12,7 +12,7 @@ memtest() {
       do
         for l in "${thread[@]}"
         do
-          echo "./mem $i $j $k $l"
+          ./mem $i $j $k $l
         done
       done
     done
