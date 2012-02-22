@@ -1,10 +1,14 @@
 #include "stdafx.hpp"
 
-void print_results(long size, double dur)
+void print_results(char *cmd, bool is_random, int block_size, int n_thread, long size, double dur)
 {
-  std::cout << "Size: " << size << " Bytes" << std::endl;
-  std::cout << "Time: " << dur*1000 << " ms" << std::endl;
-  std::cout << "Throughput: " << ((double)size/1024/1024)/(dur) << " MB/s" << std::endl;
+  std::cout << cmd << ", ";
+  std::cout << is_random << ", ";
+  std::cout << block_size << ", ";
+  std::cout << n_thread << ", ";
+  std::cout << "Size, " << size << ", Bytes, ";
+  std::cout << "Time, " << dur*1000 << ", ms, ";
+  std::cout << "Throughput, " << ((double)size/1024/1024)/(dur) << ", MB/s" << std::endl;
 }
 
 void random_read_worker(const int block_size)
@@ -69,17 +73,13 @@ void memt(char *cmd, bool is_random, int block_size, int n_thread)
   double dur = 0.0;
   if(is_random)
   {
-    std::cout << "randomly ";
-    
     if(strcmp(cmd, "read")==0)
     {
-      std::cout << "read" << std::endl;
       for(int j=0;j<n_thread;++j)
         worker[j] = boost::thread(&random_read_worker, block_size);
     }
     else if(strcmp(cmd, "write")==0)
     {
-      std::cout << "write" << std::endl;
       for(int j=0;j<n_thread;++j)
         worker[j] = boost::thread(&random_write_worker, block_size);
     }
@@ -88,25 +88,22 @@ void memt(char *cmd, bool is_random, int block_size, int n_thread)
   {
     if(strcmp(cmd, "read")==0)
     {
-      std::cout << "read" << std::endl;
       for(int j=0;j<n_thread;++j)
         worker[j] = boost::thread(read_worker, block_size);
     }
     else if(strcmp(cmd, "write")==0)
     {
-      std::cout << "write" << std::endl;
       for(int j=0;j<n_thread;++j)
         worker[j] = boost::thread(write_worker, block_size);
     }
   }
-  std::cout << "start timer ...." << std::endl;
   auto start = NOW();
   for(int j=0;j<n_thread;++j)
     worker[j].join();
   auto end = NOW();
   dur = DURATION(end, start);
   size = 2 * block_size * n_thread;
-  print_results(size, dur);
+  print_results(cmd, is_random, block_size, n_thread, size, dur);
 }
 
 int main(int argc, char * argv[])
