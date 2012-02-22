@@ -1,7 +1,7 @@
 .PHONY: all clean
 CCC=g++
 CCFLAGS=-std=c++0x -I/usr/include/boost -L/usr/lib -lboost_thread-mt -lboost_system-mt -lpthread
-OBJECTS=cpu mem predisk disk network_client network_server
+OBJECTS=cpu mem disk network_client network_server
 
 all: $(OBJECTS)
 
@@ -16,9 +16,6 @@ cpu: cpu.cpp stdafx.hpp
 
 mem: memory.cpp stdafx.hpp
 	$(CCC) -o mem memory.cpp $(CCFLAGS)
-
-predisk: predisk.cpp stdafx.hpp
-	$(CCC) -o predisk predisk.cpp $(CCFLAGS)
 
 disk: disk.cpp stdafx.hpp
 	$(CCC) -o disk disk.cpp $(CCFLAGS)

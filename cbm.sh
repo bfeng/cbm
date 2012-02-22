@@ -19,6 +19,27 @@ memtest() {
   done
 }
 
+disktest() {
+  rw_arr=("read" "write")
+  is_random=("true" "false")
+  block_size=(1 10 100 1024 10240 102400 1024000 10240000 102400000 1024000000)
+  thread=(1 2 4 8)
+
+  for i in "${rw_arr[@]}"
+  do
+    for j in "${is_random[@]}"
+    do
+      for k in "${block_size[@]}"
+      do
+        for l in "${thread[@]}"
+        do
+          echo "./disk $i $j $k $l"
+        done
+      done
+    done
+  done
+}
+
 case "$1" in
   cpu)
     echo "cpu testing"
@@ -46,6 +67,9 @@ case "$1" in
         ;;
       mem)
         memtest
+        ;;
+      disk)
+        disktest
         ;;
       *)
         echo "Usuage: $0 $1 {cpu|mem|disk|client|server}"

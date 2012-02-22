@@ -1,135 +1,128 @@
 #include "stdafx.hpp"
 
-void disk_read_seq_worker()
+void disk_read_seq_worker(std::string filename_str)
 {
-  
+  FILE *fd = fopen(filename_str.data(), "r");
+  while(fgetc(fd)!=EOF);
+  fclose(fd);
 }
 
-void print_result(long file_size, double dur)
+void disk_write_seq_worker(std::string filename_str, int size)
 {
-    std::cout << "Size: " << file_size << " Bytes" << std::endl;
-    std::cout << "Time: " << dur << " ms" << std::endl;
-    std::cout << "Throughput: " << ((float)file_size/1024/1024)/(dur/1000) << " MB/s" << std::endl;
+  FILE *fd = fopen(filename_str.data(), "w");
+  for(int j=0;j<size;++j)
+  {
+    fputc('0', fd);
+  }
+  fclose(fd);
 }
 
-void one_thread()
+void disk_read_ran_worker(std::string filename_str, int size)
 {
-  std::cout << "Disk Test" << "\t~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
-  int size[] = {1, 10, 100, 1024, 10*1024, 100*1024, 1024*1024, 100*1024*1024, 1024*1024*1024};
-  int n = sizeof(size)/sizeof(int);
-
-  std::cout << "Read Operation" << std::endl;
-  for(int i=0;i<n;++i)
+  std::ifstream file(filename_str);
+  char c;
+  for(int k=0;k<size;++k)
   {
-    std::string filename_str = "./files/"+std::to_string(size[i])+"B.tst"; 
-    const char * filename = filename_str.data();
-
-    auto start = NOW();
-    FILE *fd = fopen(filename, "r");
-    while(fgetc(fd)!=EOF);
-    fclose(fd);
-    auto end = NOW();
-
-    double dur = DURATION(end, start);
-    
-    struct stat buf;
-    stat(filename, &buf);
-    long file_size = buf.st_size;
-
-    print_result(file_size, dur);
+    int ram = rand() % size;
+    file.seekg(ram, std::ios::beg);
+    file.get(c);
   }
-
-  std::cout << "Write Operation" << std::endl;
-  for(int i=0;i<n;++i)
-  {
-    std::string filename_str = "./files/"+std::to_string(size[i])+"B_write.tst"; 
-    const char * filename = filename_str.data();
-
-    if(remove(filename)==0);
-
-    auto start = NOW();
-    FILE *fd = fopen(filename, "w");
-    for(int j=0;j<size[i];++j)
-    {
-      fputc('\0', fd);
-    }
-    fclose(fd);
-    auto end = NOW();
-
-    double dur = DURATION(end, start);
-    
-    struct stat buf;
-    stat(filename, &buf);
-    long file_size = buf.st_size;
-
-    print_result(file_size, dur);
-  }
-
-  std::cout << "Random Read Operations" << std::endl;
-  for(int i=0;i<n;++i)
-  {
-    std::string filename_str = "./files/"+std::to_string(size[i])+"B.tst";
-
-    char c;
-    auto start = NOW();
-    std::ifstream file(filename_str);
-    for(int k=0;k<size[n];++k)
-    {
-      //auto start1 = NOW();
-      int ram = rand() % size[n];
-      //auto end1 = NOW();
-      //start += end1-start1;
-      file.seekg(ram, std::ios::beg);
-      file.get(c);
-    }
-    file.close();
-    auto end = NOW();
-
-    double dur = DURATION(end, start);
-
-    struct stat buf;
-    stat(filename_str.data(), &buf);
-    long file_size = buf.st_size;
-
-    print_result(file_size, dur);
-  }
-
-  /*
-  std::cout << "Random Write Operations" << std::endl;
-  for(int i=0;i<n;++i)
-  {
-    std::string filename_str = "./files/"+std::to_string(size[i])+"B.tst";
-
-    char c = '\0';
-    auto start = NOW();
-    std::ofstream file(filename_str);
-    for(int k=0;k<size[n];++k)
-    {
-      //auto start1 = NOW();
-      int ram = rand() % size[n];
-      //auto end1 = NOW();
-      //start += end1-start1;
-      //file.seekp(ram, std::ios::beg);
-      //file.put(c);
-    }
-    file.close();
-    auto end = NOW();
-
-    double dur = DURATION(end, start);
-
-    struct stat buf;
-    stat(filename_str.data(), &buf);
-    long file_size = buf.st_size;
-    std::cout << "Size: " << file_size << " Bytes" << std::endl;
-    std::cout << "Time: " << dur << " s" << std::endl;
-    std::cout << "Throughput: " << ((float)file_size/1024/1024)/(dur) << " MB/s" << std::endl;
-  }
-  */
+  file.close();
 }
 
-int main()
+void disk_write_ran_worker(std::string filename_str, int size)
 {
-  one_thread();
+  std::ofstream file(filename_str);
+  char c;
+  for(int k=0;k<size;++k)
+  {
+    int ram = rand() % size;
+    file.seekp(ram, std::ios::beg);
+    file.put(c);
+  }
+  file.close();
+}
+
+void diskt(char *cmd, bool is_random, int block_size, int n_thread)
+{
+  boost::thread worker[n_thread];
+  long size = 0;
+  double dur = 0.0;
+
+  if(is_random)
+  {
+    if(strcmp(cmd, "read")==0)
+    {
+      for(int i=0;i<n_thread;++i)
+      {
+        std::stringstream file_out;
+        file_out << "./files/" << block_size << "B." << i << ".tst";
+
+        if(cbm::make_ran_file(block_size, file_out.str()) < 0)
+          return;
+        
+        worker[i] = boost::thread(disk_read_ran_worker, file_out.str(), block_size);
+      }
+    }
+    else if(strcmp(cmd, "write")==0)
+    {
+      for(int i=0;i<n_thread;++i)
+      {
+        std::stringstream file_out;
+        file_out << "./files/" << block_size << "B.write." << i << ".tst";
+
+        worker[i] = boost::thread(disk_write_ran_worker, file_out.str(), block_size);
+      }
+    }
+  }
+  else
+  {
+    if(strcmp(cmd, "read")==0)
+    {
+      for(int i=0;i<n_thread;++i)
+      {
+        std::stringstream file_out;
+        file_out << "./files/" << block_size << "B." << i << ".tst";
+
+        if(cbm::make_ran_file(block_size, file_out.str()) < 0)
+          return;
+        
+        worker[i] = boost::thread(disk_read_seq_worker, file_out.str());
+      }
+    }
+    else if(strcmp(cmd, "write")==0)
+    {
+      for(int i=0;i<n_thread;++i)
+      {
+        std::stringstream file_out;
+        file_out << "./files/" << block_size << "B.write." << i << ".tst";
+
+        worker[i] = boost::thread(disk_write_seq_worker, file_out.str(), block_size);
+      }
+    }
+  }
+
+  auto start = NOW();
+  for(int j=0;j<n_thread;++j)
+    worker[j].join();
+  auto end = NOW();
+  dur = DURATION(end, start);
+
+  size = block_size * n_thread;
+  cbm::print_results(cmd, is_random, block_size, n_thread, size, dur);
+}
+
+int main(int argc, char *argv[])
+{
+  if(argc != 5)
+  {
+    std::cerr << "Usuage: <read/write> <is_random> <block_size> <n_thread>" << std::endl;
+    return 1;
+  }
+
+  srand(time(0));
+  bool is_random = strcmp(argv[2], "true")==0?true:false;
+  diskt(argv[1], is_random, atoi(argv[3]), atoi(argv[4]));
   return 0;
 }
 
