@@ -1,16 +1,5 @@
 #include "stdafx.hpp"
 
-void print_results(char *cmd, bool is_random, int block_size, int n_thread, long size, double dur)
-{
-  std::cout << cmd << ", ";
-  std::cout << is_random << ", ";
-  std::cout << block_size << ", ";
-  std::cout << n_thread << ", ";
-  std::cout << "Size, " << size << ", Bytes, ";
-  std::cout << "Time, " << dur*1000 << ", ms, ";
-  std::cout << "Throughput, " << ((double)size/1024/1024)/(dur) << ", MB/s" << std::endl;
-}
-
 void random_read_worker(const int block_size)
 {
   char mem[block_size];
@@ -103,7 +92,7 @@ void memt(char *cmd, bool is_random, int block_size, int n_thread)
   auto end = NOW();
   dur = DURATION(end, start);
   size = 2 * block_size * n_thread;
-  print_results(cmd, is_random, block_size, n_thread, size, dur);
+  cbm::print_results(cmd, is_random, block_size, n_thread, size, dur);
 }
 
 int main(int argc, char * argv[])
@@ -117,17 +106,6 @@ int main(int argc, char * argv[])
   srand(time(0));
   bool is_random = strcmp(argv[2], "true")==0?true:false;
   memt(argv[1], is_random, atoi(argv[3]), atoi(argv[4]));
-  /*
-  const int N[] = {1, 10, 100, 1024, 100*1024, 1024*1024};
-  int n = sizeof(N)/sizeof(int);
-  for(int i=0;i<n;++i)
-  {
-    n_thread(1, N[i]);
-    n_thread(2, N[i]);
-    n_thread(4, N[i]);
-    n_thread(8, N[i]);
-  }
-  */
   return 0;
 }
 

@@ -35,6 +35,35 @@ namespace cbm
       arr[i] = c;
     }
   }
+
+  void print_results(char *cmd, bool is_random, int block_size, int n_thread, long size, double dur)
+  {
+    std::cout << cmd << ", ";
+    std::cout << is_random << ", ";
+    std::cout << block_size << ", ";
+    std::cout << n_thread << ", ";
+    std::cout << "Size, " << size << ", Bytes, ";
+    std::cout << "Time, " << dur*1000 << ", ms, ";
+    std::cout << "Throughput, " << ((double)size/1024/1024)/(dur) << ", MB/s" << std::endl;
+  }
+
+  int make_ran_file(long size, std::string filename)
+  {
+    FILE *fd = fopen(filename.data(), "w");
+    if(fd == NULL)
+    {
+      perror("open file error");
+      return -1;
+    }
+    for(int j=0;j<size;++j)
+    {
+      fputc(rand(), fd);
+    }
+    if(fd != NULL)
+      fclose(fd);
+
+    return 0;
+  }
 }
 
 #endif
