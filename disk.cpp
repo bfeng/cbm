@@ -19,28 +19,26 @@ void disk_write_seq_worker(std::string filename_str, int size)
 
 void disk_read_ran_worker(std::string filename_str, int size)
 {
-  std::ifstream file(filename_str);
-  char c;
-  for(int k=0;k<size;++k)
+  FILE *fd = fopen(filename_str.data(), "r");
+  for(int i=0;i<size;++i)
   {
     int ram = rand() % size;
-    file.seekg(ram, std::ios::beg);
-    file.get(c);
+    fseek(fd, ram, SEEK_SET);
+    fgetc(fd);
   }
-  file.close();
+  fclose(fd);
 }
 
 void disk_write_ran_worker(std::string filename_str, int size)
 {
-  std::ofstream file(filename_str);
-  char c;
-  for(int k=0;k<size;++k)
+  FILE *fd = fopen(filename_str.data(), "r");
+  for(int i=0;i<size;++i)
   {
     int ram = rand() % size;
-    file.seekp(ram, std::ios::beg);
-    file.put(c);
+    fseek(fd, ram, SEEK_SET);
+    fputc('A', fd);
   }
-  file.close();
+  fclose(fd);
 }
 
 void diskt(char *cmd, bool is_random, int block_size, int n_thread)

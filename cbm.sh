@@ -1,3 +1,12 @@
+cputest() {
+  thread=(1 2 4 8)
+  
+  for l in "${thread[@]}"
+  do
+    ./cpu $l
+  done
+}
+
 memtest() {
   rw_arr=("read" "write")
   is_random=("true" "false")
@@ -22,7 +31,8 @@ memtest() {
 disktest() {
   rw_arr=("read" "write")
   is_random=("true" "false")
-  block_size=(1 10 100 1024 10240 102400 1024000 10240000 102400000 1024000000)
+  ##block_size=(1 10 100 1024 10240 102400 1024000 10240000 102400000 1024000000)
+  block_size=(1 10 100 1024 10240 102400 1024000 10240000)
   thread=(1 2 4 8)
 
   for i in "${rw_arr[@]}"
@@ -38,6 +48,10 @@ disktest() {
       done
     done
   done
+}
+
+loopbacktest() {
+  echo "loopback"
 }
 
 case "$1" in
@@ -64,6 +78,7 @@ case "$1" in
   test)
     case "$2" in
       cpu)
+        cputest
         ;;
       mem)
         memtest
@@ -71,8 +86,11 @@ case "$1" in
       disk)
         disktest
         ;;
+      loopback)
+        loopbacktest
+        ;;
       *)
-        echo "Usuage: $0 $1 {cpu|mem|disk|client|server}"
+        echo "Usuage: $0 $1 {cpu|mem|disk|loopback}"
         exit 1
     esac
     ;;
