@@ -60,12 +60,9 @@ void cput(int n)
 
   // integer operations test
   long operations = long(std::pow(N, 3)*3)*n;
-  std::cout<<"Total Integer Operations:"<<operations<<std::endl;
 
   for(int j=0;j<test;++j)
   {
-    std::cout << "Test "<< j << "\t~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
-
     double dur = 0.0;
     int A[N][N];
     int B[N][N];
@@ -84,17 +81,13 @@ void cput(int n)
     auto end = NOW();
     dur = DURATION(end, start);
 
-    std::cout << "Duration:" << dur*1000 << " ms" << std::endl;
-    std::cout << "IOPS:"<< operations/(dur) << std::endl;
+    std::cout << n << ", Duration, " << dur*1000 << ", ms" << ", IOPS, "<< operations/(dur) << std::endl;
   }
 
   // floating-point operations test
-  std::cout<<"Total Floating-point Operations:"<<operations<<std::endl;
 
   for(int j=0;j<test;++j)
   {
-    std::cout << "Test "<< j << "\t~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
-
     double dur = 0.0;
     float A[N][N];
     float B[N][N];
@@ -113,8 +106,7 @@ void cput(int n)
     auto end = NOW();
     dur = DURATION(end, start);
 
-    std::cout << "Duration:" << dur*1000 << " ms" << std::endl;
-    std::cout << "FLOPS:"<< operations/(dur) << std::endl;
+    std::cout << n << ", Duration, " << dur*1000 << ", ms" << ", FLOPS, "<< operations/(dur) << std::endl;
   }
 }
 

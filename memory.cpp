@@ -1,57 +1,44 @@
 #include "stdafx.hpp"
 
-void random_read_worker(const int block_size)
+void random_read_worker(char mem[], const int block_size)
 {
-  char mem[block_size];
-  int ran[block_size];
   char tmp;
+  int idx;
 
   for(int i=0;i<block_size;++i)
   {
-    ran[i] = rand()%block_size;
-    mem[i] = (char)(ran[i]+'A');
-  }
-
-  for(int i = 0;i<block_size;++i)
-  {
-    tmp = mem[ran[i]];
+    idx = rand()%block_size;
+    tmp = mem[idx];
   }
 }
 
-void random_write_worker(const int block_size)
+void random_write_worker(char mem[], const int block_size)
 {
-  char mem[block_size];
-  int ran[block_size];
   char tmp = 'A';
+  int idx;
 
   for(int i=0;i<block_size;++i)
   {
-    ran[i] = rand()%block_size;
-    mem[i] = (char)(ran[i]+'A');
-  }
-  for(int i = 0;i<block_size;++i)
-  {
-    mem[ran[i]] = tmp;
+    idx = rand()%block_size;
+    mem[idx] = tmp;
   }
 }
 
-void read_worker(const int block_size)
+void read_worker(char mem[], const int block_size)
 {
-  char mem[block_size];
-  char c;
+  char tmp;
   for(int i = 0;i<block_size;++i)
   {
-    c = mem[i];
+    tmp = mem[i];
   }
 }
 
-void write_worker(const int block_size)
+void write_worker(char mem[], const int block_size)
 {
-  char mem[block_size];
-  char c;
+  char tmp;
   for(int i = 0;i<block_size;++i)
   {
-    mem[i] = c;
+    mem[i] = tmp;
   }
 }
 
@@ -60,17 +47,18 @@ void memt(char *cmd, bool is_random, int block_size, int n_thread)
   boost::thread worker[n_thread];
   long size = 0;
   double dur = 0.0;
+  char mem_space[1024*1024];
   if(is_random)
   {
     if(strcmp(cmd, "read")==0)
     {
       for(int j=0;j<n_thread;++j)
-        worker[j] = boost::thread(&random_read_worker, block_size);
+        worker[j] = boost::thread(random_read_worker, mem_space, block_size);
     }
     else if(strcmp(cmd, "write")==0)
     {
       for(int j=0;j<n_thread;++j)
-        worker[j] = boost::thread(&random_write_worker, block_size);
+        worker[j] = boost::thread(random_write_worker, mem_space, block_size);
     }
   }
   else
@@ -78,12 +66,12 @@ void memt(char *cmd, bool is_random, int block_size, int n_thread)
     if(strcmp(cmd, "read")==0)
     {
       for(int j=0;j<n_thread;++j)
-        worker[j] = boost::thread(read_worker, block_size);
+        worker[j] = boost::thread(read_worker, mem_space, block_size);
     }
     else if(strcmp(cmd, "write")==0)
     {
       for(int j=0;j<n_thread;++j)
-        worker[j] = boost::thread(write_worker, block_size);
+        worker[j] = boost::thread(write_worker, mem_space, block_size);
     }
   }
   auto start = NOW();
@@ -91,7 +79,7 @@ void memt(char *cmd, bool is_random, int block_size, int n_thread)
     worker[j].join();
   auto end = NOW();
   dur = DURATION(end, start);
-  size = 2 * block_size * n_thread;
+  size = block_size * n_thread;
   cbm::print_results(cmd, is_random, block_size, n_thread, size, dur);
 }
 

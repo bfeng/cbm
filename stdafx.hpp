@@ -36,7 +36,7 @@ namespace cbm
     }
   }
 
-  void print_results(char *cmd, bool is_random, int block_size, int n_thread, long size, double dur)
+  void print_results(char *cmd, bool is_random, int block_size, int n_thread, unsigned long size, double dur)
   {
     std::cout << cmd << ", ";
     std::cout << is_random << ", ";
@@ -49,9 +49,16 @@ namespace cbm
 
   int make_ran_file(long size, std::string filename)
   {
+    struct stat buffer;
+    if(stat(filename.data(), &buffer) == 0)
+    {
+      if(buffer.st_size == size)
+        return 0;
+    }
     FILE *fd = fopen(filename.data(), "w");
     if(fd == NULL)
     {
+      std::cout << filename << ": ";
       perror("open file error");
       return -1;
     }

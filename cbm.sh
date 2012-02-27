@@ -10,7 +10,7 @@ cputest() {
 memtest() {
   rw_arr=("read" "write")
   is_random=("true" "false")
-  block_size=(1 10 100 1024 10240 102400 1024000)
+  block_size=(1 1024 1048576)
   thread=(1 2 4 8)
 
   for i in "${rw_arr[@]}"
@@ -31,8 +31,7 @@ memtest() {
 disktest() {
   rw_arr=("read" "write")
   is_random=("true" "false")
-  ##block_size=(1 10 100 1024 10240 102400 1024000 10240000 102400000 1024000000)
-  block_size=(1 10 100 1024 10240 102400 1024000 10240000)
+  block_size=(1 1024 1048576 1073741824)
   thread=(1 2 4 8)
 
   for i in "${rw_arr[@]}"
@@ -50,8 +49,26 @@ disktest() {
   done
 }
 
+## buggy here
 loopbacktest() {
-  echo "loopback"
+  protocol=("tcp" "udp")
+  buf_size=(1 1024 1048576)
+  thread=(1 2 4 8)
+
+  for i in "${protocol[@]}"
+  do
+    for j in "${buf_size[@]}"
+    do
+      for k in "${thread[@]}"
+      do
+        eval "./network_server $i 13000 $j $k &"
+        pid=$!
+        ./network_client $i localhost 13000 $j $k
+        sleep 1
+        kill $pid
+      done
+    done
+  done
 }
 
 case "$1" in
@@ -75,19 +92,35 @@ case "$1" in
     echo "server starting"
     ./network_server $2 $3 $4 $5
     ;;
+  loopback)
+    ./network_server $2 $3 $4 $5 &
+    ./network_client $2 localhost $3 $4 $5
+    ;;
   test)
     case "$2" in
       cpu)
-        cputest
+        for i in 1 2 3
+        do
+          cputest
+        done
         ;;
       mem)
-        memtest
+        for i in 1 2 3
+        do
+          memtest
+        done
         ;;
       disk)
-        disktest
+        for i in 1 2 3
+        do
+          disktest
+        done
         ;;
       loopback)
-        loopbacktest
+        for i in 1 2 3
+        do
+          loopbacktest
+        done
         ;;
       *)
         echo "Usuage: $0 $1 {cpu|mem|disk|loopback}"

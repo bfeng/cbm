@@ -57,9 +57,6 @@ void tcp_server_worker(tcp::acceptor *acceptor, int buf_size)
     else if(error)
       throw boost::system::system_error(error);
 
-
-    std::cout << recv_buf << std::endl;
-
     boost::asio::write(socket, boost::asio::buffer(recv_buf, recv_len));
   }
 }

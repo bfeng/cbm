@@ -13,9 +13,9 @@ void print_result(long size[], double dur[], int n_thread)
     t_dur += dur[i];
   }
 
-  std::cout << "Time: " << t_dur << " s" << std::endl;
-  std::cout << "Size: " << t_size << "B" << std::endl;
-  std::cout << "Speed: " << ((double)t_size)*8/1024/1024/(t_dur) << "Mbps" << std::endl;
+  std::cout << "Time, " << t_dur << " s, ";
+  std::cout << "Size, " << t_size << "B, ";
+  std::cout << "Speed, " << ((double)t_size)*8/1024/1024/(t_dur) << "Mbps" << std::endl;
 }
 
 void udp_client_worker(char host[], char port[], const unsigned int buf_size, long *size, double *dur)
@@ -28,28 +28,23 @@ void udp_client_worker(char host[], char port[], const unsigned int buf_size, lo
   udp::resolver::query query(udp::v4(), host, port);
   udp::resolver::iterator iterator = resolver.resolve(query);
 
-  int times = 100*1024/buf_size + ((100*1024%buf_size==0)?0:1);
-
   *size = 0;
   *dur = 0.0;
 
-  for(int i=0;i<times;++i)
-  {
-    char arr[buf_size];
-    cbm::rand_char_array(arr, buf_size);
-    const char * request = arr;
+  char arr[buf_size];
+  cbm::rand_char_array(arr, buf_size);
+  const char * request = arr;
 
-    auto start = NOW();
-    socket.send_to(boost::asio::buffer(request, buf_size), *iterator);
+  auto start = NOW();
+  socket.send_to(boost::asio::buffer(request, buf_size), *iterator);
 
-    char recv_buf[buf_size];
-    udp::endpoint sender_endpoint;
-    size_t len = socket.receive_from(boost::asio::buffer(recv_buf, buf_size), sender_endpoint);
+  char recv_buf[buf_size];
+  udp::endpoint sender_endpoint;
+  size_t len = socket.receive_from(boost::asio::buffer(recv_buf, buf_size), sender_endpoint);
 
-    auto end = NOW();
-    *dur += DURATION(end, start);
-    *size += buf_size + len;
-  }
+  auto end = NOW();
+  *dur += DURATION(end, start);
+  *size += buf_size + len;
 }
 
 void udp_client(char host[], char port[], const unsigned int buf_size, int n_thread)
@@ -84,27 +79,22 @@ void tcp_client_worker(char host[], char port[], const unsigned int buf_size, lo
   tcp::socket socket(io_service);
   socket.connect(*iterator);
 
-  int times = 100*1024/buf_size + ((100*1024%buf_size==0)?0:1);
-
   *size = 0;
   *dur = 0.0;
 
-  for(int i=0;i<times;++i)
-  {
-    char arr[buf_size];
-    cbm::rand_char_array(arr, buf_size);
-    const char * request = arr;
+  char arr[buf_size];
+  cbm::rand_char_array(arr, buf_size);
+  const char * request = arr;
 
-    auto start = NOW();
-    boost::asio::write(socket, boost::asio::buffer(request, buf_size));
+  auto start = NOW();
+  boost::asio::write(socket, boost::asio::buffer(request, buf_size));
 
-    char recv_buf[buf_size];
-    size_t len = boost::asio::read(socket, boost::asio::buffer(recv_buf, buf_size));
+  char recv_buf[buf_size];
+  size_t len = boost::asio::read(socket, boost::asio::buffer(recv_buf, buf_size));
 
-    auto end = NOW();
-    *dur += DURATION(end, start);
-    *size += buf_size + len;
-  }
+  auto end = NOW();
+  *dur += DURATION(end, start);
+  *size += buf_size + len;
 }
 
 void tcp_client(char host[], char port[], const unsigned int buf_size, int n_thread)
@@ -139,11 +129,9 @@ int main(int argc, char * argv[])
   int buf_size = atoi(argv[4]);
   int n_thread = atoi(argv[5]);
   if(strcmp(argv[1], "udp")==0)
-    for(int i=0;i<10;++i)
-      udp_client(argv[2], argv[3], buf_size, n_thread);
+    udp_client(argv[2], argv[3], buf_size, n_thread);
   else
-    for(int i=0;i<10;++i)
-      tcp_client(argv[2], argv[3], buf_size, n_thread);
+    tcp_client(argv[2], argv[3], buf_size, n_thread);
   return 0;
 }
 
